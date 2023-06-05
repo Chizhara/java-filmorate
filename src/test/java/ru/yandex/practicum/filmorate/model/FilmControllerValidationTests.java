@@ -1,79 +1,65 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.junit.jupiter.api.*;
 
-import java.nio.charset.StandardCharsets;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import java.time.LocalDate;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-@WebMvcTest
+
+@SpringBootTest
 public class FilmControllerValidationTests {
-    private static final Gson gson = GsonBuilder.getGson();
-    static final String url = "http://localhost:8080/";
+
     @Autowired
-    private MockMvc mockMvc;
+    Validator validator;
 
     @Test
-    public void validateCorrectFilm() throws Exception {
-        Film film = Film.builder().id(1).name("Фильм").durationInMinutes(5).
-                releaseDate(LocalDate.of(2000, 1, 1)).description("Описание фильма").build();
+    public void validateCorrectFilm() {
+        Film film = Film.builder().id(1).name("Фильм").duration(5)
+                .releaseDate(LocalDate.of(2000, 1, 1)).description("Описание фильма").build();
 
-        MvcResult result = mockMvc.perform(post(url + "/film").
-                content(gson.toJson(film)).contentType("application/json")).
-                andExpect(status().isOk()).andReturn();
-
-        String filmJson = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
-        assertEquals(film, gson.fromJson(filmJson, Film.class), "Фильмы не сопадают");
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertTrue(violations.isEmpty());
     }
 
     @Test
-    public void shouldNotValidateFilmWithDate1895dec27() throws Exception {
-        Film film = Film.builder().id(1).name("Фильм").durationInMinutes(5).
-                releaseDate(LocalDate.of(1895, 12, 27)).description("Описание фильма").build();
+    public void shouldNotValidateFilmWithDate1895dec27() {
+        Film film = Film.builder().id(1).name("Фильм").releaseDate(LocalDate.of(1895, 12, 27))
+                        .description("Описание фильма").duration(5).build();
 
-        mockMvc.perform(post(url + "/film").
-                        content(gson.toJson(film)).contentType("application/json")).
-                andExpect(status().is4xxClientError()).andReturn();
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty());
     }
 
     @Test
-    public void shouldNotValidateFilmWithNullName() throws Exception {
-        Film film = Film.builder().id(1).name(null).durationInMinutes(5).
-                releaseDate(LocalDate.of(2000, 12, 27)).description("Описание фильма").build();
+    public void shouldNotValidateFilmWithNullName() {
+        Film film = Film.builder().id(1).name(null).duration(5)
+                .releaseDate(LocalDate.of(2000, 12, 27)).description("Описание фильма").build();
 
-        MvcResult result = mockMvc.perform(post(url + "/film").
-                        content(gson.toJson(film)).contentType("application/json")).
-                andExpect(status().is4xxClientError()).andReturn();
-
-        String filmJson = result.getResponse().getContentAsString();
-        assertTrue(filmJson.isEmpty(), "Фильм добавился");
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty());
     }
 
     @Test
-    public void shouldNotValidateFilmWithDescriptionLength201() throws Exception {
-        Film film = Film.builder().id(1).name("Фильм").durationInMinutes(5).
-                releaseDate(LocalDate.of(2000, 12, 27)).description("О".repeat(201)).build();
+    public void shouldNotValidateFilmWithDescriptionLength201() {
+        Film film = Film.builder().id(1).name("Фильм").duration(5)
+                .releaseDate(LocalDate.of(2000, 12, 27))
+                .description("О".repeat(201)).build();
 
-        mockMvc.perform(post(url + "/film").
-                        content(gson.toJson(film)).contentType("application/json")).
-                andExpect(status().is4xxClientError());
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty());
     }
 
     @Test
-    public void shouldNotValidateFilmWithNegativeDuration() throws Exception {
-        Film film = Film.builder().id(1).name("Фильм").durationInMinutes(0).
-                releaseDate(LocalDate.of(2000, 12, 27)).description("Описание фильма").build();
+    public void shouldNotValidateFilmWithNegativeDuration() {
+        Film film = Film.builder().id(1).name("Фильм").duration(0)
+                .releaseDate(LocalDate.of(2000, 12, 27)).description("Описание фильма").build();
 
-        mockMvc.perform(post(url + "/film").
-                content(gson.toJson(film)).contentType("application/json")).
-                andExpect(status().is4xxClientError());
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty());
     }
 }

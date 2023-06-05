@@ -1,47 +1,41 @@
 package ru.yandex.practicum.filmorate;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.Service;
 
-import jakarta.validation.Valid;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import javax.validation.Valid;
+import java.util.List;
 
 @RestController
-@RequestMapping("/film")
+@RequestMapping("/films")
 @Slf4j
 public class FilmController {
-    private static final Set<Film> films = new HashSet<>();
+
+    private final Service<Film> filmService = new Service<>();
+
     @PostMapping
-    public ResponseEntity<Film> addFilm(@Valid @RequestBody Film film) {
-        log.debug("Получен запрос Post /film");
-        films.add(film);
-        return new ResponseEntity<>(film, HttpStatus.OK);
+    public Film addFilm(@Valid @RequestBody Film film) {
+        log.info("Получен запрос Post /film  {}", film.toString());
+        filmService.add(film);
+        return film;
     }
 
     @PutMapping
-    public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film film) {
-        log.debug("Получен запрос Put /film");
-        Optional<Film> filmOptional = films.stream().filter(film1 -> film1.getId() == film.getId()).findAny();
-        if (filmOptional.isPresent()) {
-            Film filmTemp = filmOptional.get();
-            filmTemp.setDescription(film.getDescription());
-            filmTemp.setName(film.getName());
-            filmTemp.setDurationInMinutes(film.getDurationInMinutes());
-            filmTemp.setReleaseDate(film.getReleaseDate());
+    public Film updateFilm(@Valid @RequestBody Film film) {
+        log.info("Получен запрос Put /film  {}", film.toString());
+        if (filmService.update(film)) {
+            return film;
         } else {
-            films.add(film);
+            log.info("Ошибка! передан неизвестный фильм");
+            throw new IllegalAccessError();
         }
-        return new ResponseEntity<>(film, HttpStatus.OK);
     }
 
     @GetMapping
-    public Set<Film> getFilms() {
-        log.debug("Получен запрос Get /film");
-        return films;
+    public List<Film> getFilms() {
+        log.info("Получен запрос Get /film");
+        return filmService.getAll();
     }
 }

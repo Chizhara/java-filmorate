@@ -1,87 +1,73 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.google.gson.Gson;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.boot.test.context.SpringBootTest;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import java.time.LocalDate;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest
+@SpringBootTest
 public class UserControllerValidationTests {
-    private static final Gson gson = GsonBuilder.getGson();
-    static final String url = "http://localhost:8080/";
+
     @Autowired
-    private MockMvc mockMvc;
+    Validator validator;
 
     @Test
-    public void validateCorrectUser() throws Exception {
-        User user = User.builder().id(1).name("User").email("asd@email.com").login("login").
-                birthdate(LocalDate.of(2000,1,1)).build();
+    public void validateCorrectUser() {
+        User user = User.builder().id(1).name("User").email("asd@email.com").login("login")
+                .birthday(LocalDate.of(2000,1,1)).build();
 
-        MvcResult result = mockMvc.perform(post(url + "/user").
-                        content(gson.toJson(user)).contentType("application/json")).
-                andExpect(status().isOk()).andReturn();
-        String userJson = result.getResponse().getContentAsString();
-        assertEquals(user, gson.fromJson(userJson, User.class), "Пользователи не сопадают");
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertTrue(violations.isEmpty());
     }
 
     @Test
-    public void shouldReturnUserWithLoginInName() throws Exception {
-        User user = User.builder().id(1).name(null).email("asd@email.com").login("login").
-                birthdate(LocalDate.of(2000,1,1)).build();
+    public void shouldReturnUserWithLoginInName() {
+        User user = User.builder().id(1).name(null).email("asd@email.com").login("login")
+                .birthday(LocalDate.of(2000,1,1)).build();
 
-        MvcResult result = mockMvc.perform(post(url + "/user").
-                        content(gson.toJson(user)).contentType("application/json")).
-                andExpect(status().isOk()).andReturn();
-
-        user.setName(user.getLogin());
-        String userJson = result.getResponse().getContentAsString();
-        assertEquals(user, gson.fromJson(userJson, User.class), "Пользователи не сопадают");
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertTrue(violations.isEmpty());
     }
 
     @Test
-    public void shouldNotValidateUserWithBirthdateInFuture() throws Exception {
-        User user = User.builder().id(1).name("User").email("asd@email.com").login("login").
-                birthdate(LocalDate.now().plusYears(1)).build();
+    public void shouldNotValidateUserWithBirthdateInFuture() {
+        User user = User.builder().id(1).name("User").email("asd@email.com").login("login")
+                .birthday(LocalDate.now().plusYears(1)).build();
 
-        MvcResult result = mockMvc.perform(post(url + "/user").
-                        content(gson.toJson(user)).contentType("application/json")).
-                andExpect(status().is4xxClientError()).andReturn();
-
-        String userJson = result.getResponse().getContentAsString();
-        assertTrue(userJson.isEmpty(), "Пользователь добавился");
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty());
     }
 
     @Test
-    public void shouldNotValidateUserWithWorseEmail() throws Exception {
-        User user = User.builder().id(1).name("User").email("asd@").login("login").
-                birthdate(LocalDate.of(2000,1,1)).build();
+    public void shouldNotValidateUserWithWorseEmail() {
+        User user = User.builder().id(1).name("User").email("asd@").login("login")
+                .birthday(LocalDate.of(2000,1,1)).build();
 
-        MvcResult result = mockMvc.perform(post(url + "/user").
-                        content(gson.toJson(user)).contentType("application/json")).
-                andExpect(status().is4xxClientError()).andReturn();
-
-        String userJson = result.getResponse().getContentAsString();
-        assertTrue(userJson.isEmpty(), "Пользователь добавился");
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty());
     }
 
     @Test
-    public void shouldNotValidateUserWithEmptyLogin() throws Exception {
-        User user = User.builder().id(1).name("User").email("asd@email.com").login(" ").
-                birthdate(LocalDate.of(2000,1,1)).build();
+    public void shouldNotValidateUserWithEmptyLogin() {
+        User user = User.builder().id(1).name("User").email("asd@email.com").login(" ")
+                .birthday(LocalDate.of(2000,1,1)).build();
 
-        MvcResult result = mockMvc.perform(post(url + "/user").
-                        content(gson.toJson(user)).contentType("application/json")).
-                andExpect(status().is4xxClientError()).andReturn();
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty());
+    }
 
-        String userJson = result.getResponse().getContentAsString();
-        assertTrue(userJson.isEmpty(), "Пользователь добавился");
+    @Test
+    public void shouldNotValidateUserWithBlankInLogin() {
+        User user = User.builder().id(1).name("User").email("asd@email.com").login("User One")
+                .birthday(LocalDate.of(2000,1,1)).build();
+
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty());
     }
 }

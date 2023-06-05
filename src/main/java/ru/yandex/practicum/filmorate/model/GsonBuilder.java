@@ -9,9 +9,11 @@ import java.io.IOException;
 import java.time.LocalDate;
 
 public class GsonBuilder {
+
     private static Gson gsonInstance;
+
     public static Gson getGson() {
-        if(gsonInstance == null) {
+        if (gsonInstance == null) {
             com.google.gson.GsonBuilder gsonBuilder = new com.google.gson.GsonBuilder();
             gsonBuilder.registerTypeAdapter(LocalDate.class, new LocalDateAdapter());
             return gsonInstance = gsonBuilder.create();
@@ -19,7 +21,9 @@ public class GsonBuilder {
             return gsonInstance;
         }
     }
+
     private static class LocalDateAdapter extends TypeAdapter<LocalDate> {
+
         @Override
         public void write(JsonWriter jsonWriter, LocalDate localDate) throws IOException {
             if (localDate == null) {
