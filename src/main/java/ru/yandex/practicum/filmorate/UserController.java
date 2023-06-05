@@ -15,7 +15,9 @@ import java.util.Set;
 @RequestMapping("/user")
 @Slf4j
 public class UserController {
+
     Set<User> users = new HashSet<>();
+
     @PostMapping
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
         log.debug("Получен запрос Post /user");
@@ -28,7 +30,7 @@ public class UserController {
     public ResponseEntity<User> updateFilm(@Valid @RequestBody User user) {
         log.debug("Получен запрос Put /user");
         Optional<User> userOptional = users.stream().filter(userTemp -> userTemp.getId() == user.getId()).findAny();
-        if (userOptional.isPresent()) {
+        if(userOptional.isPresent()) {
             User userTemp = userOptional.get();
             userTemp.setBirthdate(user.getBirthdate());
             userTemp.setName(user.getName());
@@ -47,7 +49,7 @@ public class UserController {
     }
 
     private void checkName(User user) {
-        if(user.getName() == null || user.getName().isBlank()) {
+        if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
     }

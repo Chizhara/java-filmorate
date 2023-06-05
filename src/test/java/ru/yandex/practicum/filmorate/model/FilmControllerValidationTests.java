@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 @WebMvcTest
 public class FilmControllerValidationTests {
+
     private static final Gson gson = GsonBuilder.getGson();
     static final String url = "http://localhost:8080/";
     @Autowired
@@ -39,8 +40,7 @@ public class FilmControllerValidationTests {
         Film film = Film.builder().id(1).name("Фильм").durationInMinutes(5).
                 releaseDate(LocalDate.of(1895, 12, 27)).description("Описание фильма").build();
 
-        mockMvc.perform(post(url + "/film").
-                        content(gson.toJson(film)).contentType("application/json")).
+        mockMvc.perform(post(url + "/film").content(gson.toJson(film)).contentType("application/json")).
                 andExpect(status().is4xxClientError()).andReturn();
     }
 
@@ -49,9 +49,8 @@ public class FilmControllerValidationTests {
         Film film = Film.builder().id(1).name(null).durationInMinutes(5).
                 releaseDate(LocalDate.of(2000, 12, 27)).description("Описание фильма").build();
 
-        MvcResult result = mockMvc.perform(post(url + "/film").
-                        content(gson.toJson(film)).contentType("application/json")).
-                andExpect(status().is4xxClientError()).andReturn();
+        MvcResult result = mockMvc.perform(post(url + "/film").content(gson.toJson(film)).
+                        contentType("application/json")).andExpect(status().is4xxClientError()).andReturn();
 
         String filmJson = result.getResponse().getContentAsString();
         assertTrue(filmJson.isEmpty(), "Фильм добавился");
@@ -60,10 +59,10 @@ public class FilmControllerValidationTests {
     @Test
     public void shouldNotValidateFilmWithDescriptionLength201() throws Exception {
         Film film = Film.builder().id(1).name("Фильм").durationInMinutes(5).
-                releaseDate(LocalDate.of(2000, 12, 27)).description("О".repeat(201)).build();
+                releaseDate(LocalDate.of(2000, 12, 27)).
+                description("О".repeat(201)).build();
 
-        mockMvc.perform(post(url + "/film").
-                        content(gson.toJson(film)).contentType("application/json")).
+        mockMvc.perform(post(url + "/film").content(gson.toJson(film)).contentType("application/json")).
                 andExpect(status().is4xxClientError());
     }
 
@@ -72,8 +71,7 @@ public class FilmControllerValidationTests {
         Film film = Film.builder().id(1).name("Фильм").durationInMinutes(0).
                 releaseDate(LocalDate.of(2000, 12, 27)).description("Описание фильма").build();
 
-        mockMvc.perform(post(url + "/film").
-                content(gson.toJson(film)).contentType("application/json")).
+        mockMvc.perform(post(url + "/film").content(gson.toJson(film)).contentType("application/json")).
                 andExpect(status().is4xxClientError());
     }
 }

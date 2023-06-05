@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest
 public class UserControllerValidationTests {
+
     private static final Gson gson = GsonBuilder.getGson();
     static final String url = "http://localhost:8080/";
     @Autowired
@@ -26,7 +27,7 @@ public class UserControllerValidationTests {
                 birthdate(LocalDate.of(2000,1,1)).build();
 
         MvcResult result = mockMvc.perform(post(url + "/user").
-                        content(gson.toJson(user)).contentType("application/json")).
+                content(gson.toJson(user)).contentType("application/json")).
                 andExpect(status().isOk()).andReturn();
         String userJson = result.getResponse().getContentAsString();
         assertEquals(user, gson.fromJson(userJson, User.class), "Пользователи не сопадают");
@@ -38,7 +39,7 @@ public class UserControllerValidationTests {
                 birthdate(LocalDate.of(2000,1,1)).build();
 
         MvcResult result = mockMvc.perform(post(url + "/user").
-                        content(gson.toJson(user)).contentType("application/json")).
+                content(gson.toJson(user)).contentType("application/json")).
                 andExpect(status().isOk()).andReturn();
 
         user.setName(user.getLogin());
@@ -52,7 +53,7 @@ public class UserControllerValidationTests {
                 birthdate(LocalDate.now().plusYears(1)).build();
 
         MvcResult result = mockMvc.perform(post(url + "/user").
-                        content(gson.toJson(user)).contentType("application/json")).
+                content(gson.toJson(user)).contentType("application/json")).
                 andExpect(status().is4xxClientError()).andReturn();
 
         String userJson = result.getResponse().getContentAsString();
@@ -65,7 +66,7 @@ public class UserControllerValidationTests {
                 birthdate(LocalDate.of(2000,1,1)).build();
 
         MvcResult result = mockMvc.perform(post(url + "/user").
-                        content(gson.toJson(user)).contentType("application/json")).
+                content(gson.toJson(user)).contentType("application/json")).
                 andExpect(status().is4xxClientError()).andReturn();
 
         String userJson = result.getResponse().getContentAsString();
@@ -77,8 +78,8 @@ public class UserControllerValidationTests {
         User user = User.builder().id(1).name("User").email("asd@email.com").login(" ").
                 birthdate(LocalDate.of(2000,1,1)).build();
 
-        MvcResult result = mockMvc.perform(post(url + "/user").
-                        content(gson.toJson(user)).contentType("application/json")).
+        MvcResult result = mockMvc.perform(post(url + "/user").content(gson.toJson(user)).
+                contentType("application/json")).
                 andExpect(status().is4xxClientError()).andReturn();
 
         String userJson = result.getResponse().getContentAsString();

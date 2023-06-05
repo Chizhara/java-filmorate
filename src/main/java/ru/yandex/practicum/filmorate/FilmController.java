@@ -15,7 +15,9 @@ import java.util.Set;
 @RequestMapping("/film")
 @Slf4j
 public class FilmController {
+
     private static final Set<Film> films = new HashSet<>();
+
     @PostMapping
     public ResponseEntity<Film> addFilm(@Valid @RequestBody Film film) {
         log.debug("Получен запрос Post /film");
