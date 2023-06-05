@@ -15,7 +15,9 @@ import java.util.Set;
 @RequestMapping("/user")
 @Slf4j
 public class UserController {
+
     Set<User> users = new HashSet<>();
+
     @PostMapping
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
         log.debug("Получен запрос Post /user");
