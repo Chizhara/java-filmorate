@@ -1,6 +1,7 @@
-package ru.yandex.practicum.filmorate;
+package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -13,7 +14,8 @@ import java.util.List;
 @Slf4j
 public class UserController {
 
-    UserService userService = new UserService();
+    @Autowired
+    private UserService userService;
 
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
@@ -28,8 +30,17 @@ public class UserController {
         if (userService.update(user)) {
             return user;
         } else {
-            log.info("Ошибка! передан неизвестный фильм");
-            throw new IllegalAccessError();
+            throw new IllegalAccessError("Неверный идентификатор");
+        }
+    }
+
+    @GetMapping("/{id}")
+    public User getById(@PathVariable int id) {
+        log.info("Получен запрос Get /user {}", id);
+        try {
+            return userService.get(id);
+        } catch (NullPointerException e) {
+            throw new IllegalAccessError(e.getMessage());
         }
     }
 
