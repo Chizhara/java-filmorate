@@ -1,9 +1,10 @@
-package ru.yandex.practicum.filmorate;
+package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.Service;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -12,8 +13,8 @@ import java.util.List;
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
-
-    private final Service<Film> filmService = new Service<>();
+    @Autowired
+    private FilmService filmService;
 
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) {
@@ -28,8 +29,7 @@ public class FilmController {
         if (filmService.update(film)) {
             return film;
         } else {
-            log.info("Ошибка! передан неизвестный фильм");
-            throw new IllegalAccessError();
+            throw new IllegalAccessError("Отсутствует фильм с значением поля id = " + film.getId());
         }
     }
 
@@ -37,5 +37,21 @@ public class FilmController {
     public List<Film> getFilms() {
         log.info("Получен запрос Get /film");
         return filmService.getAll();
+    }
+
+    @GetMapping("/{id}")
+    public Film getById(@PathVariable int id) {
+        log.info("Получен запрос Get /user");
+        try {
+            return filmService.get(id);
+        } catch (NullPointerException e) {
+            throw new IllegalAccessError(e.getMessage());
+        }
+    }
+
+    @GetMapping("/popular")
+    public List<Film> getFilms(@RequestParam(defaultValue = "10") int count) {
+        log.info("Получен запрос Get /film/popular");
+        return filmService.getFilmsRating(count);
     }
 }

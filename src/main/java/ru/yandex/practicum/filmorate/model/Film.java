@@ -1,12 +1,12 @@
 package ru.yandex.practicum.filmorate.model;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Positive;
 import lombok.Builder;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 import ru.yandex.practicum.filmorate.annotation.LocalDateMinDateConstraint;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
 import java.time.LocalDate;
 
 @Data
