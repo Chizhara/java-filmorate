@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Objects;
 
@@ -9,6 +10,8 @@ public class FriendLink {
 
     private final User userA;
     private final User userB;
+    @Setter
+    private boolean confirm;
 
     public FriendLink(User userA, User userB) {
         if (userA == null || userB == null) {
@@ -19,6 +22,7 @@ public class FriendLink {
         }
         this.userA = userA;
         this.userB = userB;
+        this.confirm = false;
     }
 
     public boolean isContains(int userId) {
