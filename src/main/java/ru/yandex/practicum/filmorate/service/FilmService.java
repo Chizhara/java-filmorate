@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.FilmUsersLikes;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -15,9 +17,9 @@ public class FilmService extends Service<Film> {
     private UserService userService;
     @Autowired
     private FilmStorage filmStorage;
-
-    public FilmService(FilmStorage filmStorage) {
+    public FilmService(JdbcTemplate jdbcTemplate, FilmStorage filmStorage) {
         super(filmStorage);
+        System.out.println(jdbcTemplate.queryForList("SELECT * FROM users"));
     }
 
     public FilmUsersLikes addLike(int filmId, int userId) {

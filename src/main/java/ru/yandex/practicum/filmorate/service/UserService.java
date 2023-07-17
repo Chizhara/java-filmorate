@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcOperations;
+import ru.yandex.practicum.filmorate.dao.UserDao;
 import ru.yandex.practicum.filmorate.model.FriendLink;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -14,9 +16,11 @@ import java.util.stream.Collectors;
 public class UserService extends Service<User> {
     @Autowired
     private UserStorage userStorage;
+    private UserDao userDao;
 
-    public UserService(UserStorage userStorage) {
+    public UserService(UserStorage userStorage, UserDao userDao) {
         super(userStorage);
+        System.out.println(userDao.getAllUsers());
     }
 
     @Override
