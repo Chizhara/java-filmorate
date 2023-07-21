@@ -3,38 +3,50 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Getter
 public class FriendLink {
 
-    private final User userA;
-    private final User userB;
+    @NotNull
+    private final User initiator;
+    @NotNull
+    private final User recipient;
     @Setter
     private boolean confirm;
 
     public FriendLink(User userA, User userB) {
-        if (userA == null || userB == null) {
-            throw new IllegalAccessError("Передан неверный идентификатор пользователя");
+        this(userA, userB, false);
+    }
+
+    public FriendLink(User initiator, User recipient, boolean confirm) {
+        if (initiator.equals(recipient)) {
+            throw new IllegalArgumentException("Передан неверный идентификатор друга");
         }
-        if (userA.equals(userB)) {
-            throw new IllegalAccessError();
-        }
-        this.userA = userA;
-        this.userB = userB;
-        this.confirm = false;
+        this.initiator = initiator;
+        this.recipient = recipient;
+        this.confirm = confirm;
     }
 
     public boolean isContains(int userId) {
-        return userA.getId() == userId || userB.getId() == userId;
+        return initiator.getId() == userId || recipient.getId() == userId;
+    }
+
+    public boolean isFriendByUserId(int userId) {
+        if (userId == initiator.getId()) {
+            return true;
+        } else {
+            return (userId == recipient.getId() && confirm);
+        }
     }
 
     public User getUserById(int userId) {
-        return userA.getId() == userId ? userA : userB.getId() == userId ? userB : null;
+        return initiator.getId() == userId ? initiator : recipient.getId() == userId ? recipient : null;
     }
 
     public User getFriendByUserId(int userId) {
-        return userA.getId() == userId ? userB : userB.getId() == userId ? userA : null;
+        return initiator.getId() == userId ? recipient : recipient.getId() == userId ? initiator : null;
     }
 
     @Override
@@ -42,11 +54,11 @@ public class FriendLink {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FriendLink that = (FriendLink) o;
-        return userA.equals(that.userA) || userB.equals(that.userB);
+        return initiator.equals(that.initiator) || recipient.equals(that.recipient);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userA, userB);
+        return Objects.hash(initiator, recipient);
     }
 }

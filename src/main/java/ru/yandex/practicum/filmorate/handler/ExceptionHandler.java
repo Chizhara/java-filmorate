@@ -20,6 +20,13 @@ public class ExceptionHandler {
     }
 
     @org.springframework.web.bind.annotation.ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleValidationException(final IllegalArgumentException e) {
+        log.info("Ошибка! {}", e.getMessage());
+        return Map.of("Ошибка корректности данных", e.getMessage());
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleIllegalAccessError(final IllegalAccessError e) {
         log.info("Ошибка! {}", e.getMessage());
@@ -29,7 +36,7 @@ public class ExceptionHandler {
     @org.springframework.web.bind.annotation.ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, String> handleRuntimeException(final RuntimeException e) {
-        log.info("Ошибка! {}", e.getMessage());
+        log.info("Ошибка! {} {}", e.getClass(), e.getMessage());
         return Map.of("Ошибка!", e.getMessage());
     }
 }

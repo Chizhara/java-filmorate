@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.annotation.LocalDateMinDateConstraint;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -22,6 +23,11 @@ public class Film implements Identifiable {
     private LocalDate releaseDate;
     @Positive
     private int duration;
-    private List<String> genre;
-    private String mpaRating;
+    @Builder.Default
+    private List<Genre> genres = new ArrayList<>();
+    private MpaRate mpa;
+
+    public void addGenre(Genre genre) {
+        genres.add(genre);
+    }
 }

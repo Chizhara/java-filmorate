@@ -8,7 +8,10 @@ import java.util.Optional;
 public interface UserDao {
 
     Optional<User> findUserById(int id);
+
     List<User> getAllUsers();
-    boolean updateUser(User user);
-    void addUser(User user);
+
+    Integer updateUser(User user);
+
+    Integer addUser(User user);
 }
