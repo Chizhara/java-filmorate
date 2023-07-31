@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exceptions.NoDataFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -19,32 +20,31 @@ public class FilmController {
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) {
         log.info("Получен запрос Post /film  {}", film.toString());
-        filmService.add(film);
-        return film;
+        return filmService.add(film);
     }
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
         log.info("Получен запрос Put /film  {}", film.toString());
-        if (filmService.update(film)) {
-            return film;
-        } else {
-            throw new IllegalAccessError("Отсутствует фильм с значением поля id = " + film.getId());
+        try {
+            return filmService.updateFilmById(film);
+        } catch (NoDataFoundException e) {
+            throw new IllegalAccessError(e.getMessage());
         }
     }
 
     @GetMapping
     public List<Film> getFilms() {
         log.info("Получен запрос Get /film");
-        return filmService.getAll();
+        return filmService.getAllFilms();
     }
 
     @GetMapping("/{id}")
     public Film getById(@PathVariable int id) {
         log.info("Получен запрос Get /user");
         try {
-            return filmService.get(id);
-        } catch (NullPointerException e) {
+            return filmService.findFilmById(id);
+        } catch (NoDataFoundException e) {
             throw new IllegalAccessError(e.getMessage());
         }
     }
