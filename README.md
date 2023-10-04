@@ -1,39 +1,26 @@
-# java-filmorate
-Template repository for Filmorate project.
+# Filmorate
+####
+### General
+#### The project was completed as part of a task on Yandex practicum.
 
+This project provides an opportunity to evaluate films and share your ratings. The main functionality includes:
+- Add and update films;
+- Add and update users;
+- Users can likes films;
+- Users can request a list of popular movies (according to the likes received);
+- Users can send a friendship request and confirm them.
 
-![ERD](/assets/pdf/ERD.pdf)
+### Technology stack:
 
-GET users
-SELECT * 
-FROM users
+- [Java 11](https://docs.aws.amazon.com/corretto/latest/corretto-11-ug/downloads-list.html)
+- [Spring](https://start.spring.io) (Boot, MVC),
+- [H2](https://www.baeldung.com/spring-boot-h2-database)
+- [Maven](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads)
 
-GET films
-SELECT f.id,
-       f.name,
-       f.description,
-       f.releaseDate,
-       f.duration,
-       mpa.name
-FROM film AS f
-LEFT JOIN mpa_date_id AS mpa ON mpa.mpa_rate_id = f.mpa_rate_id
+#### Also used
+- JDBC
+- lombok
+- JUnit
 
-GET film genres ("id" is id of film whose genres looking for)
-SELECT fg.name
-FROM film_genre AS fg
-INNER JOIN genre AS g ON g.genre_id = fg.genre_id 
-WHERE g.film_id = id
-
-GET films likes count
-SELECT f.film_id,
-       f.name,
-       COUNT(l.user_id) AS likes_count
-FROM film
-LEFT JOIN likes AS l ON l.film_id = f.film_id
-GROUP BY f.film_id, f.name
-ORDER BY likes_count DESC
-
-GET user friends ("id" is id of user whose genres looking for. If you need to upload complete data about friends, you can use this query as a subquery or use another query using UNION and split the condition in WHERE)
-SELECT user_id
-FROM friend_link AS fl
-WHERE fl.initiator_user_id = id =  OR (fl.recipient_user_id = id AND fl.confirm = true)
+### ER-diagram:
+![ERD scheme](assets/png/ER-scheme.png "ERD scheme")
